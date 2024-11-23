@@ -32,11 +32,11 @@ const userSchema = Schema({
     },
     profilePic: {
         type: String,
-        required:false
+        required: false
     },
     profilePic_PublicId: {
         type: String,
-        required:false
+        required: false
     },
     followings: [
         {
@@ -53,13 +53,17 @@ const userSchema = Schema({
     profile: {
         type: String
     },
-    isBlocked:{
-        type:Boolean,
-        default:false
+    isBlocked: {
+        type: Boolean,
+        default: false
     },
-    createdAt:{
-        type:Date,
-        default:Date.now()
+    createdAt: {
+        type: Date,
+        default: Date.now()
+    },
+    authType: {
+        type: String,
+        required: false
     }
 })
 

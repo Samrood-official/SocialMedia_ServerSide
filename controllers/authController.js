@@ -21,6 +21,7 @@ export const register = async (req, res) => {
             userName: req.body.userName,
             email: req.body.email,
             password: hashedpassword,
+            authType: 'email',
             phoneNumber: req.body.phoneNumber
         })
         const accessToken = Jwt.sign({
@@ -43,20 +44,20 @@ export const register = async (req, res) => {
             subject: "verify your email using otp",
             html: `<h1>Your Otp Code ${otp}</h1>`
         }
-        transport.sendMail(details,(err)=>{
-            if(err){
-                
-            }else
-            console.log('success..........');
+        transport.sendMail(details, (err) => {
+            if (err) {
+
+            } else
+                console.log('success..........');
         })
 
         return res.status(200).json({
-            status: "pending",  
+            status: "pending",
             message: "Please check your email",
             user: user._id,
         })
     } catch (err) {
-        
+
         return res.status(500).json("internal error Occured" + err)
     }
 }
@@ -65,13 +66,11 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         // const userData = await User.findOne({ userName: req.body.userName }).populate('followers').populate('followings')
-        console.log("🚀 ~ login ~ userData:")
-        const userData = await User.findOne({ userName: req.body.userName })
-        console.log("🚀 ~ login ~ userData: result", userData)
+        const userData = await User.findOne({ email: req.body.email })
         if (!userData) {
             return res.status(400).json({ msg: "user Not Exist" })
         }
-        if(userData.isBlocked){
+        if (userData.isBlocked) {
             return res.status(400).json({ msg: "You are blocked" })
         }
 
@@ -87,7 +86,7 @@ export const login = async (req, res) => {
         res.status(200).json({ user, accessToken })
 
     } catch (err) {
-        
+
         return res.status(500).json({ error: err.message })
     }
 }
@@ -120,7 +119,7 @@ export const verifyEmail = async (req, res) => {
         })
         return res.status(200).json({ user, accessToken })
     } catch (err) {
-        
+
         return res.status(500).json('internal error')
     }
 }
@@ -134,7 +133,7 @@ export const forgotPassword = async (req, res) => {
         let userId = user._id
         const randomText = crypto.randomBytes(20).toString('hex')
         const resetToken = new ResetToken({
-            user: user._id, 
+            user: user._id,
             token: randomText
         })
         await resetToken.save()
@@ -148,8 +147,8 @@ export const forgotPassword = async (req, res) => {
         return res.status(200).json({ msg: 'check your email to reset password' })
 
     } catch (err) {
-        
-        return res.status(500).json({msg:'internal error'})
+
+        return res.status(500).json({ msg: 'internal error' })
     }
 }
 
@@ -181,7 +180,7 @@ export const resetPassword = async (req, res) => {
         })
         return res.status(200).json({ msg: 'you can login now' })
     } catch (err) {
-        
+
         return res.status(500).json('internal error')
     }
 }
@@ -193,20 +192,23 @@ export const googleLogin = async (req, res) => {
         const token = authHeader.split(" ")[1];
         const result = Jwt.decode(token)
         const name = result.name
-        const userName = result.given_name
+        const userName = result.given_name + '_' + Math.floor(Math.random() * 10000);
         const email = result.email
-        const checkUser =await User.findOne({email:email})
-        if(checkUser){
+        const checkUser = await User.findOne({ email: email })
+
+        if (checkUser) {
             const accessToken = Jwt.sign({
                 id: checkUser._id,
                 userName: checkUser.userName,
             }, jwt_secret_key)
 
-            return res.status(200).json({ user:checkUser, accessToken })
+            return res.status(200).json({ user: checkUser, accessToken })
         }
+
         const user = await new User({
-            name, email, userName,verified:true
+            name, email, userName, authType: 'google', verified: true
         })
+
         await user.save()
         const accessToken = Jwt.sign({
             id: user._id,
@@ -214,7 +216,7 @@ export const googleLogin = async (req, res) => {
         }, jwt_secret_key)
         return res.status(200).json({ user, accessToken })
     } catch (err) {
-        
+        console.log("🚀 ~ googleLogin ~ err:", err)
         res.status(500).json("internal error")
     }
 } 
