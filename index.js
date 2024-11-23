@@ -1,19 +1,21 @@
 import express, { json } from 'express'
-const app = express()
-import { connect } from 'mongoose'
 import dotenv from 'dotenv'
-dotenv.config()
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import { connect } from 'mongoose'
+import { createServer } from 'http'
+import { Server } from "socket.io";
+
 import userRoute from './routes/userRoutes.js'
 import adminRoute from './routes/adminRoutes.js'
 import messageRoute from './routes/messages.js'
 import chatRoute from './routes/chat.js'
-import { createServer } from 'http'
-import { Server } from "socket.io";
+import handler from './controllers/userControllers.js'
 
+const app = express()
+dotenv.config()
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
@@ -36,6 +38,7 @@ app.use(cors())
 app.use(morgan('tiny'));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+app.get('/', handler)
 app.use('/api', userRoute)
 app.use('/api/admin', adminRoute)
 app.use('/api/chats', chatRoute)
@@ -43,7 +46,7 @@ app.use('/api/messages', messageRoute)
 console.log('before server call...');
 httpServer.listen(3001, () => {
     console.log('server running succesfully');
-}) 
+})
  
 let users = []
 const addUser = (userId, socketId) => {

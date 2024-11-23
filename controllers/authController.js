@@ -67,6 +67,7 @@ export const login = async (req, res) => {
         // const userData = await User.findOne({ userName: req.body.userName }).populate('followers').populate('followings')
         console.log("🚀 ~ login ~ userData:")
         const userData = await User.findOne({ userName: req.body.userName })
+        console.log("🚀 ~ login ~ userData: result", userData)
         if (!userData) {
             return res.status(400).json({ msg: "user Not Exist" })
         }

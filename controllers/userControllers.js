@@ -2,6 +2,7 @@ import User from '../models/User.js';
 import cloudinary from '../config/cloudinary.js'
 import Post from '../models/Post.js';
 import Notification from '../models/Notification.js';
+import mongoose from 'mongoose';
 
 //follow user
 export const followUser = async (req, res) => {
@@ -268,5 +269,21 @@ export const getAllnotification = async (req, res) => {
         }
     } catch (err) {
         return res.status(200).json('internal error')
+    }
+}
+
+
+export default async function handler(req, res) {
+    try {
+        console.time("DB Connection", process.env.MONGO_URL);
+        await mongoose.connect(process.env.MONGO_URL, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.timeEnd("DB Connection=======");
+        return res.status(200).json({ msg: "Connected successfully" });
+    } catch (err) {
+        console.error("Database connection error:", err.message);
+        return res.status(500).json({ error: "Failed to connect to database", details: err.message });
     }
 }
