@@ -90,7 +90,6 @@ export const login = async (req, res) => {
         return res.status(500).json({ error: err.message })
     }
 }
-console.log("🚀 ~ login ~ login:", login)
 
 //verify email
 export const verifyEmail = async (req, res) => {
