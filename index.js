@@ -40,7 +40,7 @@ app.use('/api', userRoute)
 app.use('/api/admin', adminRoute)
 app.use('/api/chats', chatRoute)
 app.use('/api/messages', messageRoute) 
-
+console.log('before server call...');
 httpServer.listen(3001, () => {
     console.log('server running succesfully');
 }) 
