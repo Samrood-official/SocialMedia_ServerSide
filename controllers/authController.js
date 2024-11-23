@@ -65,6 +65,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         // const userData = await User.findOne({ userName: req.body.userName }).populate('followers').populate('followings')
+        console.log("🚀 ~ login ~ userData:")
         const userData = await User.findOne({ userName: req.body.userName })
         if (!userData) {
             return res.status(400).json({ msg: "user Not Exist" })
@@ -89,6 +90,7 @@ export const login = async (req, res) => {
         return res.status(500).json({ error: err.message })
     }
 }
+console.log("🚀 ~ login ~ login:", login)
 
 //verify email
 export const verifyEmail = async (req, res) => {
