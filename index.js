@@ -24,9 +24,9 @@ const io = new Server(httpServer, {
 });
 
 connect(process.env.MONGO_URL).then(() => {
-    console.log("mongoose connected",);
+    console.log("✅ Database connection successful");
 }).catch((err) => {
-    console.log("mongoose url error", err);
+    console.log("❌ Database connection error", err);
 })
 app.use(helmet())
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
