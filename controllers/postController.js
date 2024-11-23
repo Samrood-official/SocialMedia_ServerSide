@@ -51,7 +51,7 @@ export const getPost = async (req, res) => {
         console.log("dd");
         console.log(req.user.id === req.params.id)
         const { id } = req.params
-        const mypost = await Post.find({ author: id }).populate("author comments.author")
+        const mypost = await Post.find({ author: id }).populate("author comments.author").maxTimeMS(10000).exec();  
         if (!mypost) {
             return res.status(400).json({ msg: "you dont have any post" })
         }

@@ -18,9 +18,10 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
     cors: {
-        origin: 'https://main.d30vnh38wloxsg.amplifyapp.com'
+        // origin: 'https://main.d30vnh38wloxsg.amplifyapp.com'
+        origin: 'http://localhost:3000'
     }
-}); 
+});
 
 connect(process.env.MONGO_URL).then(() => {
     console.log("mongoose connected",);
@@ -45,30 +46,31 @@ httpServer.listen(3001, () => {
 }) 
  
 let users = []
-const addUser = (userId,socketId) =>{
-   !users.some(user=>user.userId === userId) && users.push({userId, socketId})
+const addUser = (userId, socketId) => {
+    !users.some(user => user.userId === userId) && users.push({ userId, socketId })
 }
-const removeUser = (socketId)=>{
-    users = users.filter((user)=>user.socketId !== socketId)
-}  
-const getUser = (userId)=>{
-    return users.find((user) =>{
-        return user.userId == userId})
+const removeUser = (socketId) => {
+    users = users.filter((user) => user.socketId !== socketId)
 }
-io.on('connection',(socket)=>{
+const getUser = (userId) => {
+    return users.find((user) => {
+        return user.userId == userId
+    })
+}
+io.on('connection', (socket) => {
     console.log('socket connected');
-    socket.on('addUser',(userId)=>{
-        addUser(userId,socket.id)
+    socket.on('addUser', (userId) => {
+        addUser(userId, socket.id)
     })
 
     //get and send messge 
-    socket.on('sendMessage',({senderId, recieverId, text})=>{
+    socket.on('sendMessage', ({ senderId, recieverId, text }) => {
         const user = getUser(recieverId)
-        io.to(user?.socketId).emit('getMessage',({senderId,text})) 
+        io.to(user?.socketId).emit('getMessage', ({ senderId, text }))
     })
-    
+
     //disconnect 
-    socket.on('disconnect',()=>{ 
+    socket.on('disconnect', () => {
         console.log('socket disconnected')
         removeUser(socket.id)
     })

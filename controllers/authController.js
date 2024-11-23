@@ -38,7 +38,7 @@ export const register = async (req, res) => {
         await verificationToken.save()
         // sending otp to user mail
         let details = {
-            from: process.env.USER_EMAIL,
+            from: process.env.USER_EMAIL || '',
             to: user.email,
             subject: "verify your email using otp",
             html: `<h1>Your Otp Code ${otp}</h1>`
