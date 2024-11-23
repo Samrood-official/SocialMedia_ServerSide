@@ -45,7 +45,7 @@ export const register = async (req, res) => {
         }
         transport.sendMail(details,(err)=>{
             if(err){
-                console.log(err);
+                
             }else
             console.log('success..........');
         })
@@ -56,7 +56,7 @@ export const register = async (req, res) => {
             user: user._id,
         })
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json("internal error Occured" + err)
     }
 }
@@ -87,7 +87,7 @@ export const login = async (req, res) => {
         res.status(200).json({ user, accessToken })
 
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json({ error: err.message })
     }
 }
@@ -120,7 +120,7 @@ export const verifyEmail = async (req, res) => {
         })
         return res.status(200).json({ user, accessToken })
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json('internal error')
     }
 }
@@ -148,7 +148,7 @@ export const forgotPassword = async (req, res) => {
         return res.status(200).json({ msg: 'check your email to reset password' })
 
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json({msg:'internal error'})
     }
 }
@@ -181,7 +181,7 @@ export const resetPassword = async (req, res) => {
         })
         return res.status(200).json({ msg: 'you can login now' })
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json('internal error')
     }
 }
@@ -214,7 +214,7 @@ export const googleLogin = async (req, res) => {
         }, jwt_secret_key)
         return res.status(200).json({ user, accessToken })
     } catch (err) {
-        console.log(err);
+        
         res.status(500).json("internal error")
     }
 } 

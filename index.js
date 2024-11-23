@@ -15,13 +15,29 @@ import chatRoute from './routes/chat.js'
 import handler from './controllers/userControllers.js'
 
 const app = express()
-dotenv.config()
 const httpServer = createServer(app);
+
+dotenv.config()
+
+app.use(helmet())
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use(json())
+app.use(cors())
+app.use(morgan('tiny'));
+app.use(bodyParser.json({ limit: "30mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+app.get('/', handler)
+app.use('/api', userRoute)
+app.use('/api/admin', adminRoute)
+app.use('/api/chats', chatRoute)
+app.use('/api/messages', messageRoute)
 
 const io = new Server(httpServer, {
     cors: {
-        // origin: 'https://main.d30vnh38wloxsg.amplifyapp.com'
-        origin: 'http://localhost:3000'
+        origin: [
+            'https://social-media-client-side.vercel.app/',
+            'http://localhost:3000'
+        ]
     }
 });
 
@@ -30,38 +46,29 @@ connect(process.env.MONGO_URL).then(() => {
 }).catch((err) => {
     console.log("❌ Database connection error", err);
 })
-app.use(helmet())
-app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
-app.use(json())
-app.use(cors())
 
-app.use(morgan('tiny'));
-app.use(bodyParser.json({ limit: "30mb", extended: true }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.get('/', handler)
-app.use('/api', userRoute)
-app.use('/api/admin', adminRoute)
-app.use('/api/chats', chatRoute)
-app.use('/api/messages', messageRoute) 
-console.log('before server call...');
 httpServer.listen(3001, () => {
     console.log('server running succesfully');
 })
- 
+
 let users = []
+
 const addUser = (userId, socketId) => {
     !users.some(user => user.userId === userId) && users.push({ userId, socketId })
 }
+
 const removeUser = (socketId) => {
     users = users.filter((user) => user.socketId !== socketId)
 }
+
 const getUser = (userId) => {
     return users.find((user) => {
         return user.userId == userId
     })
 }
+
 io.on('connection', (socket) => {
-    console.log('socket connected');
+    console.log('✅ socket connected');
     socket.on('addUser', (userId) => {
         addUser(userId, socket.id)
     })

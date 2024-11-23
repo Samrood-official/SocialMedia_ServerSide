@@ -16,7 +16,7 @@ export const updatePost = async (req, res) => {
 
         return res.status(200).json(updatedpost)
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json('internal error occured')
     }
 }
@@ -40,7 +40,7 @@ export const addPost = async (req, res) => {
         const updatedpost = await Post.findById(post._id).populate("author")
         res.status(200).json(updatedpost)
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json({ msg: "internal error occured" })
     }
 }
@@ -57,7 +57,7 @@ export const getPost = async (req, res) => {
         }
         res.status(200).json(mypost)
     } catch (err) {
-        console.log(err);
+        
         res.status(500).json('internal error')
     }
 }
@@ -76,7 +76,7 @@ export const fetchPostFollowing = async (req, res) => {
         const combinedPost = userPost.concat(flattenPost)
         return res.status(200).json(combinedPost)
     } catch (err) {
-        console.log(err);
+        
         return res.status(400).json("internal error")
     }
 }
@@ -88,7 +88,7 @@ export const fetchAllPosts = async (req, res) => {
         const posts = await Post.find({ isDeleted: false }).populate('author').populate('comments.author userName profilePc')
         return res.status(200).json(posts)
     } catch (err) {
-        console.log(err);
+        
         return res.status(400).json("internal error")
     }
 }
@@ -99,7 +99,7 @@ export const fetchPosts = async () => {
         const posts = await Post.find({ author: id })
         if (posts) return res.status(200).json(posts)
     } catch (err) {
-        console.log(err);
+        
         res.status(400).json('internal error')
     }
 }
@@ -132,7 +132,7 @@ export const commentPost = async (req, res) => {
         }
         return res.status(200).json(updatedpost)
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json("internal server error")
     }
 }
@@ -157,7 +157,7 @@ export const deletePost = async (req, res) => {
         return res.status(200).json({ id: req.params.id })
 
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json("internal server error")
     }
 }
@@ -178,7 +178,7 @@ export const reportPost = async (req, res) => {
         await report.save()
         return res.status(200).json("report added successfully")
     } catch (err) {
-        console.log(err);
+        
         return res.status(500).json('internal error occured')
     }
 }

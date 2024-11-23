@@ -6,5 +6,4 @@ const router = express.Router()
 router.post('/',verifyToken, createMessage)
 router.get('/:chatId',getMessages)
 
-
 export default router 
