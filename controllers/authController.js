@@ -8,35 +8,46 @@ import crypto from 'crypto'
 import ResetToken from '../models/ResetToken.js';
 const jwt_secret_key = process.env.jwt_secret_key
 
+const getUserName = (name) => {
+    return name.split(' ')[0] + '_' + Math.floor(Math.random() * 10000);
+}
+
 export const register = async (req, res) => {
     try {
-        let user = await User.findOne({ email: req.body.email })
+        const {name, email, phoneNumber, password} = req.body;
+        let user = await User.findOne({ email })
         if (user) {
             return res.status(403).json({ msg: "Email Already Exist" })
         }
         const saltRounds = await bcrypt.genSalt(10)
-        const hashedpassword = await bcrypt.hash(req.body.password, saltRounds)
+        const hashedpassword = await bcrypt.hash(password, saltRounds)
+        const userName = getUserName(name);
+
         user = await User.create({
-            name: req.body.name,
-            userName: req.body.userName,
-            email: req.body.email,
+            name: name,
+            userName,
+            email: email,
             password: hashedpassword,
             authType: 'email',
-            phoneNumber: req.body.phoneNumber
+            phoneNumber: phoneNumber
         })
+
         const accessToken = Jwt.sign({
             id: user._id,
             userName: user.userName,
         }, jwt_secret_key)
+
         await user.save()
 
-        //for emailverification
+        // emailverification
         const otp = genrateotp()
         const verificationToken = await VerificationToken.create({
             user: user._id,
             token: otp
         })
+
         await verificationToken.save()
+
         // sending otp to user mail
         let details = {
             from: process.env.USER_EMAIL || '',
@@ -44,6 +55,7 @@ export const register = async (req, res) => {
             subject: "verify your email using otp",
             html: `<h1>Your Otp Code ${otp}</h1>`
         }
+
         transport.sendMail(details, (err) => {
             if (err) {
 
@@ -57,7 +69,6 @@ export const register = async (req, res) => {
             user: user._id,
         })
     } catch (err) {
-
         return res.status(500).json("internal error Occured" + err)
     }
 }
@@ -192,7 +203,7 @@ export const googleLogin = async (req, res) => {
         const token = authHeader.split(" ")[1];
         const result = Jwt.decode(token)
         const name = result.name
-        const userName = result.given_name + '_' + Math.floor(Math.random() * 10000);
+        const userName = getUserName(result.given_name)
         const email = result.email
         const checkUser = await User.findOne({ email: email })
 
@@ -216,7 +227,6 @@ export const googleLogin = async (req, res) => {
         }, jwt_secret_key)
         return res.status(200).json({ user, accessToken })
     } catch (err) {
-        console.log("🚀 ~ googleLogin ~ err:", err)
         res.status(500).json("internal error")
     }
 } 
